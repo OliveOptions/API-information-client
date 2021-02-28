@@ -1,0 +1,204 @@
+﻿<Window x:Class="SampleApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:SampleApplication="clr-namespace:SampleApplication"
+        Title="Independent Reserve API Sample Application (.NET)" Height="800" Width="600">
+    
+    <DockPanel>
+
+        <StackPanel Margin="5" DockPanel.Dock="Top" >
+
+            <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                <TextBlock Padding="0,5,5,0" FontWeight="Bold">API Key:</TextBlock>
+                <TextBlock Padding="5,5,5,0" Text="{Binding ApiConfig.Credential.Key}"></TextBlock>
+            </StackPanel>
+            <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                <TextBlock Padding="0,5,5,0" FontWeight="Bold">API Url:</TextBlock>
+                <TextBlock Padding="5,5,5,0" Text="{Binding ApiConfig.BaseUrl}"></TextBlock>
+            </StackPanel>
+            <Separator/>
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" Margin="5" DockPanel.Dock="Top">
+            <TextBlock Padding="0,5,5,0" FontWeight="Bold">API method:</TextBlock>
+            <ComboBox Width="300" ItemsSource="{Binding Path=Methods}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedMethod}"></ComboBox>
+            <Button Margin="5,0,0,0" Click="CallIt_OnClick">Call It!</Button>
+        </StackPanel>
+
+        
+
+        <GroupBox Margin="5,0,5,5" DockPanel.Dock="Top" 
+                  Padding="5"
+                  Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}}">
+
+            <GroupBox.Header>
+                <Label FontSize="12" FontWeight="Bold">Specify Parameters</Label>
+            </GroupBox.Header>
+
+            <StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=primaryCurrency}">
+                    <TextBlock Style="{StaticResource Label}" >Primary Currency:</TextBlock>
+                    <SampleApplication:CurrencyComboBox SelectedValue="{Binding PrimaryCurrency}"></SampleApplication:CurrencyComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=secondaryCurrency}">
+                    <TextBlock Style="{StaticResource Label}" >Secondary Currency:</TextBlock>
+                    <SampleApplication:CurrencyComboBox SelectedValue="{Binding SecondaryCurrency}"></SampleApplication:CurrencyComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=numberOfHoursInThePastToRetrieve}">
+                    <TextBlock Style="{StaticResource Label}"># of hours to retrieve:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding NumberOfHoursInThePastToRetrieve}"></TextBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=numberOfRecentTradesToRetrieve}">
+                    <TextBlock Style="{StaticResource Label}"># of recent trades to retrieve:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding NumberOfRecentTradesToRetrieve}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=limitOrderType}">
+                    <TextBlock Style="{StaticResource Label}">Limit order type:</TextBlock>
+                    <ComboBox SelectedValue="{Binding LimitOrderType}" SelectedValuePath="Tag">
+                        <ComboBoxItem Tag="LimitBid" IsSelected="True">Limit Bid</ComboBoxItem>
+                        <ComboBoxItem Tag="LimitOffer">Limit Offer</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=marketOrderType}">
+                    <TextBlock Style="{StaticResource Label}">Market order type:</TextBlock>
+                    <ComboBox SelectedValue="{Binding MarketOrderType}" SelectedValuePath="Tag">
+                        <ComboBoxItem Tag="MarketBid" IsSelected="True">Market Bid</ComboBoxItem>
+                        <ComboBoxItem Tag="MarketOffer">Market Offer</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=limitOrderPrice}">
+                    <TextBlock Style="{StaticResource Label}">Price:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding LimitOrderPrice}"></TextBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=orderVolume}">
+                    <TextBlock Style="{StaticResource Label}">Volume:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding OrderVolume}"></TextBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=volumeCurrencyType}">
+                    <TextBlock Style="{StaticResource Label}">Volume currency type:</TextBlock>
+                    <ComboBox SelectedValue="{Binding VolumeCurrencyType}" SelectedValuePath="Tag">
+                        <ComboBoxItem Tag="Primary" IsSelected="True">Primary</ComboBoxItem>
+                        <ComboBoxItem Tag="Secondary">Secondary</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=orderGuid}">
+                    <TextBlock Style="{StaticResource Label}">Order guid:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding OrderGuid}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=accountGuid}">
+                    <TextBlock Style="{StaticResource Label}">Account guid:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding AccountGuid}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=transactionGuid}">
+                    <TextBlock Style="{StaticResource Label}">Transaction guid:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding TransactionGuid}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=fromTimestampUtc}">
+                    <TextBlock Style="{StaticResource Label}">From Timestamp (UTC):</TextBlock>
+                    <DatePicker SelectedDate="{Binding FromTimestampUtc}"></DatePicker>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=toTimestampUtc}">
+                    <TextBlock Style="{StaticResource Label}">To Timestamp (UTC):</TextBlock>
+                    <DatePicker SelectedDate="{Binding ToTimestampUtc}"></DatePicker>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=txTypes}">
+                    <TextBlock Style="{StaticResource Label}">Transaction Types:</TextBlock>
+                    <ListBox ItemsSource="{Binding TransactionTypes}" Width="250" MaxHeight="100"  SelectionMode="Multiple">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=pageIndex}">
+                    <TextBlock Style="{StaticResource Label}">Page index:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding PageIndex}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=pageSize}">
+                    <TextBlock Style="{StaticResource Label}">Page size:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding PageSize}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=withdrawalAmount}">
+                    <TextBlock Style="{StaticResource Label}">Withdrawal Amount:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding WithdrawalAmount}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=withdrawalBankAccountName}">
+                    <TextBlock Style="{StaticResource Label}">Bank Account Name:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding WithdrawalBankAccountName}"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=bankAccountGuid}">
+                    <TextBlock Style="{StaticResource Label}">Bank Account guid:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding BankAccountGuid}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=useNpp}">
+                    <TextBlock Style="{StaticResource Label}">Send instantly using NPP</TextBlock>
+                    <CheckBox IsChecked="{Binding UseNpp}" VerticalAlignment="Center"></CheckBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=address}">
+                    <TextBlock Style="{StaticResource Label}">Digital Currency Address:</TextBlock>
+                    <TextBox Style="{StaticResource RequiredTextBox}" Text="{Binding Address}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=tag}">
+                    <TextBlock Style="{StaticResource Label}">Digital Currency Tag:</TextBlock>
+                    <TextBox Text="{Binding Tag}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=comment}">
+                    <TextBlock Style="{StaticResource Label}">Comment:</TextBlock>
+                    <TextBox Style="{StaticResource TextArea}" Text="{Binding Comment}" Width="250"></TextBox>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal" Visibility="{Binding SelectedMethod, Converter={StaticResource MethodParameterToVisibilityConverter}, ConverterParameter=customId}">
+                    <TextBlock Style="{StaticResource Label}">Custom id:</TextBlock>
+                    <TextBox Text="{Binding CustomId}" Width="250"></TextBox>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        
+        <Grid Margin="5,0,5,5">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="4*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5">
+                <TextBlock FontWeight="Bold">Url:</TextBlock>
+                <TextBlock Margin="5,0,0,0"  Text="{Binding Path=LastRequestUrl}"></TextBlock>
+            </StackPanel>
+
+            <TextBlock Grid.Row="1" Margin="0,5,0,5" FontWeight="Bold">Parameters:</TextBlock>
+
+            <TextBox Grid.Row="2" Text="{Binding LastRequestParameters}" Padding="5" TextWrapping="Wrap"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+            <TextBlock Grid.Row="3" Margin="0,5,0,5" FontWeight="Bold">Response:</TextBlock>
+            <TextBox Grid.Row="4" 
+                     Text="{Binding LastRequestResponse}" 
+                     Padding="5" 
+                     TextWrapping="Wrap" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        </Grid>
+    </DockPanel>
+    
+    
+</Window>
